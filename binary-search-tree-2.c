@@ -494,8 +494,31 @@ void push(Node* aNode)
 
 Node* deQueue()
 {
+	if (front == rear&&rear == -1) //만약 front와 rear이 같은 값이고 rear이 -1일 이라면 즉, 빈 queue이라면 경고문구를 출력
+	{
+		printf("Queue is Empty");
+		return NULL;
+	}
+	else
+	{
+		front = front + 1; //fornt를 1증가 후
+		return queue[front]; //queue[front]를 리턴
+	}
+
+
 }
 
 void enQueue(Node* aNode)
 {
+	if (rear == MAX_QUEUE_SIZE) //rear이 정해놓은 큐의 크기라면, 즉 큐가 가득 찼다면 경고문구를 출력
+	{
+		printf("Queue is Full");
+	}
+
+	else
+	{
+		rear = rear + 1; //rear을 1증가 후
+		queue[rear] = aNode; //queue[rear]에 aNode를 삽입
+	}
+
 }
