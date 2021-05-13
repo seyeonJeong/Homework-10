@@ -243,6 +243,212 @@ int insert(Node* head, int key)
 
 int deleteNode(Node* head, int key)
 {
+	Node* node = head->left;
+	Node* parents = NULL; //삭제시 사용될 부모노드를 가리킬 포인터를 정의하고 초기화
+	Node* cur = NULL; // 자식노드 2개일 때 탐색에 사용될 포인터를 정의하고 초기화
+	Node* precur = NULL; //cur의 이전노드를 저장할 포인터를 정의하고 초기화
+	if (node == NULL) // 헤드 왼쪽 root노드가 NULL이라면 노드가 존재하지 않는다.
+	{
+		printf("삭제할 노드가 존재하지 않습니다.\n");
+		return 0;
+	}
+	while (node != NULL) // node가 NULL값이 아닐 때까지 반복
+	{
+		if (node->key > key) //node의 key값이 key값보다 큰경우
+		{
+			parents = node; // node가 가리키는 노드를 부모노드가 가리키게 함
+			node = node->left; //node가 가리키는 노드를 왼쪽노드로 이동
+		}
+		else if (node->key < key) //node의 key값이 key값보다 작은경우
+		{
+			parents = node; //node가 가리키는 노드를 부모노드가 가리키게함
+			node = node->right; //node가 가리키는 노드를 오른쪽노드로 이동
+		}
+		else if(node->key == key) //node의 key값이 key값과 같은경우(일단 삭제할 노드를 찾아냈다)
+		{
+			if (node->right == NULL && node->left == NULL)//만약 node의 right값이 NULL 이고 node의 left값이 NULL이면 조건문이 실행(말단 노드의 조건)
+			{
+				if (node == head->left) //만약 node가 헤드노드의 left라면? 해당 노드는 root노드이다. root노드의 right=left=NULL이라면 노드는 root빼고는 존재하지 않음
+				{
+					free(node); //node에 해당하는 노드를 해제시켜주고 반복문을 나간다(삭제완료)
+					break;
+				}
+				else if (parents->right == node) //부모노드의 오른쪽이 node라면
+				{
+					parents->right = NULL; // 부모노드의 right가 가리키는 값을 NULL로 변환(삭제하려는 노드와 이어진 포인트 연결을 해제)
+					node->right = node->left = NULL;
+					free(node);//node를 해제시켜주고 반복문을 나간다(삭제완료)
+					break;
+				}
+				else if (parents->left == node) //부모노드의 left가 가리키는 값이 node라면
+				{
+					parents->left = NULL; //부모노드의 left가 가리키는 값을 NULL로 변환(삭제하려는 노드와 이어진 포인터 연결을 해제)
+					node->right = node->left = NULL;
+					free(node); //node를 해제시켜주고 반복문을 나간다(삭제완료)
+					break;
+				}
+
+			}
+			else if (node->right == NULL || node->left == NULL) //만약 하나의 자식을 가진 비리프 노드라면
+			{
+				if (node == head->left) //만약 node가 head->left라면
+				{
+					if (node->right == NULL) //만약 node의right가 NULL값을 갖는다면  (하나의 자식을 가진 경우 이므로 두가지 경우로 분류)
+					{
+						head->left = node->left; //head의 left에 node의 left를 대입
+						node->left = NULL; //node의 left는 NULL
+						free(node); //node를 해제
+						break;
+					}
+					if (node->left == NULL) //만약 node의 left가 NULL값을 갖는다면
+					{
+
+						head->left = node->right;
+						node->right = NULL; //node->right가 NULL일 경우와 이문장 하나만 다르다
+						free(node);
+						break;
+					}
+					break;
+				}
+				if (node->right == NULL) // node의 right가 존재하지 않을때
+				{
+					if (parents->left == node) // 부모노드의 left가 node라면
+					{
+						parents->left = node->left; //부모노드의 left를 node의 left노드로 설정(node의 right는 없다는 가정)
+						free(node); // node를 해제
+						break;
+					}
+					if (parents->right == node) // 부모노드의 right가 node라면
+					{
+						parents->right = node->left; //부모노드의 right를 node의 left노드로 설정
+						free(node); //node를 해제
+						break;
+					}
+					break;
+				}
+				else if (node->left == NULL) //node의 left가 존재하지 않을때
+				{
+					if (parents->right == node) //만약 부모노드의 right가 노드라면
+					{
+						parents->right = node->right; //부모노드의 right는 node의 right노드로 설정
+						free(node); //node를 해제
+						break;
+					}
+					if (parents->left == node) //만약 부모노드의 left가 노드라면
+					{
+						parents->left = node->right; //부모노드의 left는 node의 right노드로 설정
+						free(node); //node를 해제
+						break;
+					}
+					break;
+				}
+			}
+			else if (node->left != NULL && node->right != NULL) // node가 두개의 자식을 가졌을 때
+			{
+				if (node == head->left) // 만약 node가 head->left라면 (첫번째 노드라면)
+				{
+					if (node->right->left == NULL) // 만약 노드의 right의 left 값이 NULL이라면 (오른쪽에서 가장 왼쪽의 값을 대체노드로 찾기때문에 이러한 조건이 포함되었습니다.)
+					{
+						head->left = node->right; // 헤더노드의 left는 node의 right값으로 설정
+						node->right->left = node->left; //node의 right의 left는 node의 left가 됨
+						node->left = node->right = NULL; //node의 left와 right값을 NULL로 초기화 시킨후 해제
+						free(node);
+						break;
+					}
+					cur = node->right; //대체노드를 탐색하기 위한 포인터 변수 cur을 node의 right로 설정(오른쪽에서 가장 왼쪽의 값을 찾기 위해)
+					while (cur->left != NULL) //cur의 left가 NULL값을 가질 때까지 반복한다
+					{
+						precur = cur; //cur의 이전 노드를 저장
+						cur = cur->left; //cur에 cur의 left 노드를 대입
+					}
+					precur->left = NULL; //이전 cur의 left는 NULL (cur은 대체노드이므로 cur의 이전노드에서 left는 사라짐)
+					head->left = cur; //head->left는 cur이 됨(삭제할 노드의 자리로 이동)
+					//cur의 왼쪽과 오른쪽을 원래 있던 노드의 왼쪽과 오른쪽으로 바꿈
+					cur->left = node->left;
+					cur->right = node->right;
+					//삭제할 노드의 왼쪽과 오른쪽을 NULL로 초기화 시켜준 후 노드를 해제함
+					node->right = node->left = NULL;
+					free(node);
+					break;
+
+				}
+				if (parents->left == node) //만약 부모노드의 왼쪽이 노드라면
+				{
+					if (node->right->left == NULL) // 만약 노드의 right의 left 값이 NULL이라면 (오른쪽에서 가장 왼쪽의 값을 대체노드로 찾기때문에 이러한 조건이 포함되었습니다.)
+					{
+						//삭제할 노드를 삭제하고 대체할 노드를 삭제할 노드의 자리에 삽입해주는 작업.(첫번째 조건의 함수와 비슷한 작업이므로 주석 약식작성하였습니다.)
+						parents->left = node->right; //위의 조건과 다른점은 parents를 이용한다는 점이다.
+						node->right->left = node->left;
+						node->left = node->right = NULL;
+						free(node);
+						break;
+					}
+					//cur포인터 변수를 이용하여 오른쪽에서 가장 왼쪽의 노드를 찾아낸다,
+					cur = node->right;
+					while (cur->left != NULL)
+					{
+						precur = cur;
+						cur = cur->left;
+					}
+					//삭제할 노드를 대체할 노드를 찾았기 때문에 삭제할 노드의 자리에 대체할 노드를 연결하고 대체할 노드에 연결되었던 이전 노드의 left값을 NULL로 변경해준다.
+					precur->left = NULL;
+					parents->left = cur;
+					cur->left = node->left;
+					cur->right = node->right;
+					//삭제할 노드의 왼쪽과 오른쪽을 NULL값으로 초기화 해준 후 해제함
+					node->left = node->right = NULL;
+					free(node);
+					break;
+				}
+				if (parents->right == node) //만약 부모노드의 오른쪽이 노드라면
+				{
+					if (node->right->left == NULL) // 만약 노드의 right의 left 값이 NULL이라면 (오른쪽에서 가장 왼쪽의 값을 대체노드로 찾기때문에 이러한 조건이 포함되었습니다.)
+					{
+						//부모노드의 왼쪽이 노드일때의 작업과 비슷하다. 삭제할 노드를 삭제하고 대체할 노드를 삭제할 노드의 자리에 대체해주는 작업
+						parents->right = node->right; //다른점은 parents의 right가 node의 right가 된다는 점이다.
+						node->right->left = node->left;
+						//node의 왼쪽과 오른쪽을 NULL값으로 초기화 후 해제
+						node->left = node->right = NULL;
+						free(node);
+						break;
+					}
+					//cur을 이용하여 오른쪽에서 가장 왼쪽의 노드를 찾아내는 작업
+					cur = node->right;
+					while (cur->left != NULL)
+					{
+						precur = cur;
+						cur = cur->left;
+					}
+					//오른쪽에서 가장 왼쪽의 노드를 찾아냈다면 삭제할 노드의 자리에 대체할 노드를 삽입해주고 대체할 노드가 있던자리의 포인터를 해제(precur의 left를 NULL로 초기화)
+					precur->left = NULL;
+					parents->right = cur;
+					cur->left = node->left;
+					cur->right = node->right;
+					//node의 오른쪽과 왼쪽의 값을 NULL로 초기화 한 후 해제함
+					node->left = node->right = NULL;
+					free(node);
+					break;
+				}
+
+
+			}
+
+
+
+
+		}
+
+
+	}
+	if (node == NULL) // node가 NULL이 되었지만 조건에 부합하는 노드가 존재하지 않는 경우(삭제할 노드가 존재하지 않는 경우)
+	{
+		printf("삭제할 노드가 존재하지 않습니다.\n"); //안내문구를 출력
+		return 0;
+	}
+
+
+	return 0;
+
 }
 
 
