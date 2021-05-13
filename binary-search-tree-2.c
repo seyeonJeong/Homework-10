@@ -157,18 +157,24 @@ void recursiveInorder(Node* ptr)
  */
 void iterativeInorder(Node* node)
 {
-	int top = -1;
-	treePointer stack[MAX_STACK_SIZE];
-	for (;;)
+	//스택의 성질을 이용해서 재귀를 사용하지않고 반복적으로 inorder방식을 구현할 수 있다.
+	top = -1; // top을 -1로 초기화
+	for (;;) //반복문의 역할
 	{
-		for (; node; node = node->left)
-			push(node); //스택에 삽입
-		node = pop(); //스택에서 삭제
-		if (!node)//공백 스택
+		for (; node;) //node가 NULL이 아니라면
+		{
+			push(node); //node를 stack에 push하고
+			node = node->left; //node를 node의 left가 가리키는 노드로 변경
+		}
+		node = pop(); //node를 stack에서 pop
+		if (node == NULL) //node가 NULL이라면 빈 stack임
+		{
 			break;
-		printf("%d", node->key);
-		node = node->rightChild;
+		}
+		printf("[%d]", node->key); //node의key값을 출력
+		node = node->right; //node를 node의 right가 가리키는 노드로 변경
 	}
+
 }
 
 /**
@@ -176,23 +182,30 @@ void iterativeInorder(Node* node)
  */
 void levelOrder(Node* ptr)
 {
-	int front = rear = 0;
-	treePointer queue[MAX_QUEUE_SIZE];
-	if (!ptr)
+	front = rear = -1; // front와 rear을 -1로 초기화 해줌
+	Node* n1 = NULL; //노드포인터 n1을 선언 후 초기화
+	if (ptr == NULL) //ptr(head->left)가 NULL이라면
 		return; //공백 트리
-	addq(ptr);
-	for (;;)
+	enQueue(ptr); // ptr의 값을 큐에 삽입
+	for (;;) //반복문
 	{
-		ptr = deleteq();
-		if (ptr)
+
+		n1 = deQueue(); //delete Queue를 한 값을 n1에 대입
+
+		if (n1 != NULL) //n1이 NULL이 아니라면, 즉 Queue에 값이 하나 이상 존재했다면
 		{
-			printf("%d", ptr->data);
-			if (ptr->left)
-				addq(ptr->left);
-			if (ptr->right)
-				addq(ptr->right);
+			printf("[%d]", n1->key); //n1의 key값 출력
+			if(n1->left) //만약 n1의 left가 NULL이 아니라면
+				enQueue(n1->left); //Queue에 n1의 left를 삽입
+			if(n1->right) //만약 n1의 right가 NULL이 아니라면
+				enQueue(n1->right); //Queue에 n1의 right를 삽입
 		}
-		else break;
+		else
+			break;
+	}
+	for (int i = 0; i < MAX_QUEUE_SIZE; i++) //반복문이 끝나고 큐를 초기화 해준다
+	{
+		queue[i] = NULL;
 	}
 }
 
