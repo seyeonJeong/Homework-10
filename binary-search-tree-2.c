@@ -482,10 +482,12 @@ int freeBST(Node* head)
 
 Node* pop()
 {
+	return stack[top--]; //stack[top]을 리턴해준뒤 top을 -1해줌
 }
 
 void push(Node* aNode)
 {
+	stack[++top] = aNode; //top을 +1 한 후 stack[top]의 값에 aNode의 값을 대입
 }
 
 
