@@ -465,29 +465,29 @@ int deleteNode(Node* head, int key)
 }
 
 
-void freeNode(Node* ptr)
+void freeNode(Node* ptr)//노드를 해제
 {
-	if(ptr) {
-		freeNode(ptr->left);
-		freeNode(ptr->right);
-		free(ptr);
+	if(ptr) {//ptr이 NULL이 아니라면
+		freeNode(ptr->left);//왼쪽으로 재귀
+		freeNode(ptr->right);//오른쪽으로 재귀
+		free(ptr);//ptr을 해제해줌
 	}
 }
 
-int freeBST(Node* head)
+int freeBST(Node* head)//트리를 해제
 {
 
-	if(head->left == head)
+	if(head->left == head)//빈 트리라면 head 밖에 없으므로 head만 해제해줌
 	{
 		free(head);
 		return 1;
 	}
 
-	Node* p = head->left;
+	Node* p = head->left; //head의 left 즉  루트노드를 가리키는 포인터 p 선언
 
-	freeNode(p);
+	freeNode(p);//노드를 해제하는 함수에 삽입
 
-	free(head);
+	free(head); //마지막으로 head를 해제해줌
 	return 1;
 }
 
